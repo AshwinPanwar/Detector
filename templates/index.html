@@ -190,7 +190,7 @@
         {% if predicted_class %}
         <div class="flash-card {% if predicted_class == 'benign' %}benign{% else %}danger{% endif %}">
             {% if predicted_class == 'benign' %}
-                ✅ This link looks safe to visit! ({{ predicted_class|capitalize }})
+                 This link looks safe to visit! ({{ predicted_class|capitalize }})
             {% else %}
                 🚨 Warning! This link is not safe — it’s {{ predicted_class|capitalize }}.
             {% endif %}
