@@ -1,4 +1,4 @@
-.env
+echo".env"
 __pycache__/
 *.pyc
 venv/
