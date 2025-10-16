@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhishDetect | URL & File Security Scanner</title>
+    <link rel="preload" href="https://kit.fontawesome.com/a076d05399.js" as="script">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <style>
+        :root {
+            --bg: #0A1F36;
+            --container-bg: #0D2743;
+            --text: rgba(255, 255, 255, 0.87);
+            --text-strong: #ffffff;
+            --accent: #58a6ff;
+            --benign: #2ECC71;
+            --malicious: #E74C3C;
+            --border-radius: 16px;
+            --transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --bg-benign: radial-gradient(circle at center, rgba(46, 204, 113, 0.12), #0A1F36 80%);
+            --bg-malicious: radial-gradient(circle at center, rgba(231, 76, 60, 0.12), #0A1F36 80%);
+
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            transition: var(--transition);
+        }
+
+        .navbar {
+            width: 100%;
+            background: rgba(10, 15, 20, 0.9);
+            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(12px);
+            padding: 20px 0;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            border-bottom: 1px solid rgba(88, 166, 255, 0.2);
+            z-index: 1000;
+        }
+
+        .navbar h1 {
+            margin: 0;
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--accent);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .container {
+            margin-top: 140px;
+            background: rgba(13, 39, 67, 0.85);
+            padding: 45px;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 800px;
+            text-align: center;
+            border: 1px solid rgba(88, 166, 255, 0.3);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        input, button {
+            width: 95%;
+            padding: 14px;
+            margin-bottom: 18px;
+            border-radius: 12px;
+            border: none;
+            font-size: 18px;
+        }
+
+        input {
+            border: 2px solid var(--accent);
+            background: rgba(20, 30, 50, 0.8);
+            color: var(--text-strong);
+        }
+
+        button {
+            background: linear-gradient(90deg, #238636, #2ea043);
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        button:hover {
+            transform: scale(1.04);
+        }
+
+        .spinner {
+            display: none;
+            margin: 10px auto;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--accent);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { 0% {transform: rotate(0deg);} 100% {transform: rotate(360deg);} }
+
+        .message {
+            color: var(--accent);
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+
+        /* --- NEW FLASH CARD STYLES --- */
+        .flash-card {
+            margin-top: 25px;
+            padding: 30px;
+            border-radius: 16px;
+            font-size: 22px;
+            font-weight: 600;
+            text-align: center;
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        .flash-card.benign {
+            background: rgba(46, 204, 113, 0.15);
+            color: var(--benign);
+            border: 2px solid var(--benign);
+            box-shadow: 0 0 25px rgba(46, 204, 113, 0.3);
+        }
+
+        .flash-card.danger {
+            background: rgba(231, 76, 60, 0.15);
+            color: var(--malicious);
+            border: 2px solid var(--malicious);
+            box-shadow: 0 0 25px rgba(231, 76, 60, 0.3);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1><i class="fas fa-shield-alt"></i> PhishDetect</h1>
+    </div>
+
+    <div class="container">
+        <h2><i class="fas fa-file-alt"></i> File Scam Detection</h2>
+
+        <form action="/scam/" method="post" enctype="multipart/form-data" onsubmit="showSpinner('fileSpinner')">
+            <label for="file" class="visually-hidden">Upload file</label>
+            <input type="file" name="file" id="file" required><br>
+            <button type="submit"><i class="fas fa-upload"></i> Analyze File</button>
+            <div id="fileSpinner" class="spinner"></div>
+        </form>
+
+        <h2><i class="fas fa-link"></i> URL Threat Detection</h2>
+        <form method="post" action="/predict" onsubmit="showSpinner('urlSpinner')">
+            <label for="url" class="visually-hidden">Enter URL</label>
+            <input type="text" name="url" id="url" placeholder="https://example.com" required>
+            <button type="submit"><i class="fas fa-search"></i> Classify URL</button>
+            <div id="urlSpinner" class="spinner"></div>
+        </form>
+
+        {% if message %}
+        <div class="message"><strong>{{ message }}</strong></div>
+        {% endif %}
+
+        {% if predicted_class %}
+        <div class="flash-card {% if predicted_class == 'benign' %}benign{% else %}danger{% endif %}">
+            {% if predicted_class == 'benign' %}
+                ✅ This link looks safe to visit! ({{ predicted_class|capitalize }})
+            {% else %}
+                🚨 Warning! This link is not safe — it’s {{ predicted_class|capitalize }}.
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function showSpinner(id) {
+            const spinner = document.getElementById(id);
+            spinner.style.display = 'block';
+            setTimeout(() => spinner.style.display = 'none', 3000);
+        }
+
+        // Dynamic background color effect
+        window.addEventListener("DOMContentLoaded", () => {
+            const flashCard = document.querySelector(".flash-card");
+            if (!flashCard) return;
+
+            if (flashCard.classList.contains("benign")) {
+                document.body.style.transition = "background 1s ease";
+            } else {
+                document.body.style.transition = "background 1s ease";
+            }
+        });
+    </script>
+</body>
+</html>
